@@ -14,7 +14,6 @@ public class UserServiceImp implements UserService {
 
     private final UserDao userDao;
 
-    // Внедрение через конструктор
     @Autowired
     public UserServiceImp(UserDao userDao) {
         this.userDao = userDao;
