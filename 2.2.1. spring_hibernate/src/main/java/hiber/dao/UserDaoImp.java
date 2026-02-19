@@ -12,31 +12,36 @@ import java.util.List;
 @Repository
 public class UserDaoImp implements UserDao {
 
+   private final SessionFactory sessionFactory;
+
+   // Внедрение через конструктор (рекомендуется)
    @Autowired
-   private SessionFactory sessionFactory;
+   public UserDaoImp(SessionFactory sessionFactory) {
+      this.sessionFactory = sessionFactory;
+   }
+
+   // HQL-запрос вынесен в константу
+   private static final String HQL_FIND_USER_BY_CAR =
+           "SELECT u FROM User u WHERE u.car.model = :model AND u.car.series = :series";
 
    @Override
-   public void add(User user) {
+   public void saveUser(User user) {
       sessionFactory.getCurrentSession().save(user);
    }
 
    @Override
-   @SuppressWarnings("unchecked")
-   public List<User> listUsers() {
-      TypedQuery<User> query=sessionFactory.getCurrentSession().createQuery("from User");
-      return query.getResultList();
+   public List<User> findAllUsers() {
+      return sessionFactory.getCurrentSession()
+              .createQuery("FROM User", User.class)
+              .list();
    }
-   @Override
-   public User getUserByCarModelAndSeries(String model, int series) {
-      String hql = "FROM User u WHERE u.car.model = :model AND u.car.series = :series";
-      Query<User> query = sessionFactory.getCurrentSession().createQuery(hql, User.class);
-      query.setParameter("model", model);
-      query.setParameter("series", series);
 
-      List<User> users = query.getResultList();
-      if (users.isEmpty()) {
-         return null;
-      }
-      return users.get(0);
+   @Override
+   public User findUserByCarModelAndSeries(String model, int series) {
+      Query<User> query = sessionFactory.getCurrentSession()
+              .createQuery(HQL_FIND_USER_BY_CAR, User.class)
+              .setParameter("model", model)
+              .setParameter("series", series);
+      return query.uniqueResult();
    }
 }

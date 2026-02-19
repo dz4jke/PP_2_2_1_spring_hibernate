@@ -11,24 +11,27 @@ import java.util.List;
 @Service
 public class UserServiceImp implements UserService {
 
+
+    private final UserDao userDao;
+
+    // Внедрение через конструктор
     @Autowired
-    private UserDao userDao;
+    public UserServiceImp(UserDao userDao) {
+        this.userDao = userDao;
+    }
 
     @Transactional
-    @Override
-    public void add(User user) {
-        userDao.add(user);
+    public void saveUser(User user) {
+        userDao.saveUser(user);
     }
 
     @Transactional(readOnly = true)
-    @Override
-    public List<User> listUsers() {
-        return userDao.listUsers();
+    public List<User> findAllUsers() {
+        return userDao.findAllUsers();
     }
 
     @Transactional(readOnly = true)
-    @Override
-    public User getUserByCarModelAndSeries(String model, int series) {
-        return userDao.getUserByCarModelAndSeries(model, series);
+    public User findUserByCarModelAndSeries(String model, int series) {
+        return userDao.findUserByCarModelAndSeries(model, series);
     }
 }
